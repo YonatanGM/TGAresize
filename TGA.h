@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 
+#define min(a, b) ((a) < (b) ? (a) : (b))
 
 //TGA header specification http://www.paulbourke.net/dataformats/tga/
 struct Header {

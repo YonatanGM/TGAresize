@@ -167,8 +167,8 @@ bool TGA::halfsize(const std::string& fileName) {
 			xi = 2 * i;
 			yi = 2 *j;
 
-			xf = std::min(xi + 1, header.width - 1);
-			yf = std::min(yi + 1, header.height - 1);
+			xf = min(xi + 1, header.width - 1);
+			yf = min(yi + 1, header.height - 1);
 	
 			//iterate over the channels 
 			for (int c = 0; c < 3; c++) {
