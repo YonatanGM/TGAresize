@@ -1,0 +1,32 @@
+HALFSIZE
+
+A TGA file has two parts, a header and color pixel data. When loading the TGA, I am taking the header (first 18 bytes) and storing all the fields in a struct (this will be needed to read the pixel data and when writing the resized image later). I'm also using a struct for the pixel data (containing array with entries corresponding to the R, G, B, A components). Using the information in the header (i.e image type, bitsperpixel, width, height, etc...), the pixel data can be read accordingly. 
+
+I couldn't find any color mapped images to test the program with, so program doesn't load color mapped images and bytes 3 to 7 can be ignored. Also, I am only considering uncompressed RGB, i.e image type 2. The color encoding is straight forward for 24 bit and 32 bit images, one byte corresponds to each color, but for 16 bit TGA (ARRRRRGG GGGBBBBB), bit masking is used to isolate the colors. 
+
+For the halfsizing, I defined a halfsize method, which will apply bilinear interpolation to scale the image. The way it works is by interpolating between four corner pixel color values to get the new color.  
+	Let IXJ be the dimension of the original image, O, and I'XJ' be the dimension of the scaled image, O' 
+	Let (i', j') be a pixel position in O'
+	Let i'' = (row scale factor) * 	i' and j'' = (col scale factor) * j'
+	Let i_abs = |i''|  and j_abs = |j''| 
+	Let offset_row = i'' - i_abs  and   offset_col = j'' - j_abs
+	Now pixel intensity at (i', j') is going to be, 		
+		O'(i', j') = O(i_abs - j_abs) * (1 - offset_row)
+			   + O(i_abs + 1, j_abs)*offset_row*(1-offset_col)
+			   + O(i_abs, j_abs + 1) * (1 - offset_row) * offset_row
+			   + O(i_abs+1, j_abs+1) * offset_row * offset_col
+
+	But, in the special case of halfsizing, since the offsets are 0, the formula becomes very simplified, 
+		O'(i', j') = O(i_abs - j_abs)
+	so the algorithm will be efficient.
+
+
+The halfsized TGA will have a new header (same as orginal header with length and width fields modified) and new pixel data. It is saved in uncompressed RGB format. 
+
+
+http://www.paulbourke.net/dataformats/tga/
+https://www.fileformat.info/format/tga/egff.htm 
+https://en.wikipedia.org/wiki/Bilinear_interpolation
+
+
+

@@ -53,7 +53,7 @@ bool TGA::readpixeldata(std::ifstream& tgaFile) {
 
 	for(int i=0; i <  header.width * header.height; i++) { 
 		if (!tgaFile.read((char *)&p[0], nbytes)) {    
-			std::cout << "EOF" << std::endl;
+			std::cout << "Read error" << std::endl;
 			return false;
 	     }
 	     loadpixel(&pixeldata[i],nbytes, p);		
@@ -66,15 +66,17 @@ bool TGA::readpixeldata(std::ifstream& tgaFile) {
 
 void TGA::readheader(std::ifstream& tgaFile) {
 	tgaFile.seekg(0, std::ios::beg);
+	
 	tgaFile.read (&header.idlength, sizeof(header.idlength));
 	tgaFile.read (&header.colourmaptype, sizeof(header.colourmaptype));
 	tgaFile.read (&header.datatypecode, sizeof(header.datatypecode));
-
 	
+	//color map specification 
 	tgaFile.read ((char*) &header.colourmaporigin, sizeof(header.colourmaporigin));
 	tgaFile.read ((char*) &header.colourmaplength, sizeof(header.colourmaplength));
 	tgaFile.read (&header.colourmapdepth, sizeof(header.colourmapdepth));
 
+	//image specification
 	tgaFile.read ((char*) &header.x_origin, sizeof(header.x_origin));
 	tgaFile.read ((char*) &header.y_origin, sizeof(header.y_origin));
 	tgaFile.read ((char*) &header.width, sizeof(header.width));
@@ -87,8 +89,8 @@ void TGA::readheader(std::ifstream& tgaFile) {
 void TGA::loadpixel(Pixel *pixel,int bytes, unsigned char *p) {
 	if (bytes == 4) {
 		pixel->channel[R] = p[2];
-      	pixel->channel[G] = p[1];
-      	pixel->channel[B] = p[0];
+      		pixel->channel[G] = p[1];
+      		pixel->channel[B] = p[0];
    		pixel->channel[A] = p[3];
 	} 
 	else if (bytes == 3) {
@@ -99,7 +101,7 @@ void TGA::loadpixel(Pixel *pixel,int bytes, unsigned char *p) {
 	} 
 	else if (bytes == 2) {
 		pixel->channel[R] = (p[1] & 0x7c) << 1;
-    	pixel->channel[G] = ((p[1] & 0x03) << 6) | ((p[0] & 0xe0) >> 2);
+    		pixel->channel[G] = ((p[1] & 0x03) << 6) | ((p[0] & 0xe0) >> 2);
    		pixel->channel[B] = (p[0] & 0x1f) << 3;
    		pixel->channel[A] = (p[1] & 0x80);
    }
